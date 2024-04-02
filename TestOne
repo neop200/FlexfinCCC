@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash Conversion Cycle Calculator</title>
+<style>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .container1 {
+    flex-basis: 30%;
+    height: auto;
+    margin: 10px;
+    padding: 100px;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: auto;
+  }
+.containerReceivablesGraphics {
+  display: none; /* Initially hide the new container */
+  flex-basis: 100%; /* Take up full width */
+  min-width: 200px; /* Adjust as needed */
+  margin: 10px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.containerCCCGraphics {
+  display: none; /* Initially hide the new container */
+  flex-basis: 100%; /* Take up full width */
+  min-width: 200px; /* Adjust as needed */
+  margin: 10px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+  .container {
+    flex: 1;
+    margin: 10px;
+    padding: 0;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+  .container td {
+    padding: 0; /* Remove padding from <td> elements */
+  }
+  .chart {
+    width: 210px;
+    height: 100%;
+  }
+  .button {
+    padding: 10px 15px; /* Adjust as needed */
+    font-size: 11px; /* Adjust as needed */
+    font-family: Calibri;
+    border: none;
+    border-radius: 10px;
+    background-color: #954F72;
+    color: white;
+    cursor: pointer;
+    align: right;
+    transition: background-color 0.5s ease;
+  }
+  .button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .button-container button {
+    margin-right: 10px; /* Add margin between buttons */
+  }
+  .button:hover {
+    background-color: #651E71;
+  }
+  .columns {
+    width: 100;
+    border-collapse: collapse;
+    text-align: center;
+  
+  }
+  input[type="number1"] {
+    float: right;
+    width: 110px; 
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #ffff;
+    text-align: left;
+    line-height: 1.5px;
+    padding: 5px;
+    margin-bottom: 1px;
+  }
+ input[type="number"] {
+    float: right;
+    width: 90px; 
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #ffff;
+    text-align: left;
+    line-height: 0px;
+    padding: 5px;
+    margin-bottom: 0px;
+  }
+  label {
+    float: left;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: ;
+    color: #333;
+    text-decoration: none;
+    line-height: 1.5px;
+    padding: 5px;
+    margin-bottom: 1px;
+
+  }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="container1">
+    <table class="columns">
+      <tr>
+        <td>
+          <label for="yearlyRevenue">Yearly Revenue:</label>
+          <input type="number1" id="yearlyRevenue" placeholder="Enter Value" value="€1,000,000" oninput="updateAverageReceivable(); validateInputB(this);">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="averageRevenue">Average Revenue:</label>
+          <input type="number1" id="averageRevenue" placeholder="Enter Value" value="" readonly>
+        </td> 
+      </tr>
+      <tr>
+        <td>
+          <label for="finance">Finance:</label>
+          <input type="number1" id="finance" placeholder="Enter Value" value="" readonly>
+        </td>
+      </tr>
+      <tr> 
+        <td>
+          <input type="range" min="0" max=financeValue value="0" class="slider" id="myRange" oninput="updateSliderValue(this.value); displayButton(true);">
+        </td>
+      </tr>
+      <tr>
+        <td class="button-container">
+          <button class="button" id="submitButton" onclick="FinanceButtonClick()">Submit</button>
+          <button class="button" id="resetButton" onclick="ResetButtonClick()">Reset</button> 
+        </td>
+      </tr>
+    </table>
+  </div>
+<div class="container" id="containerReceivablesGraphics">
+    <p id="dynamicText"></p>
+</div>
+<div class="container" id="containerCCCGraphics">
+    <p id="dynamicText"></p>
+</div>
+  </div>
+  <div class="container">
+    <table class="columns">
+        <tr>
+            <td>
+                <div id="stockChart" class="chart"></div>
+                <div class="input-label1">
+                    <label for="stockInput">Stock Days:</label>
+                    <input type="number" id="stockInput" placeholder="Enter Stock Days" min="0" max="999" oninput="validateInput(this)" value="20">
+                </div>
+            </td>
+            <td>
+                <div id="payableChart" class="chart"></div>
+                <div class="input-label1">
+
+                    <label for="payableInput">Payable Days:</label>
+                    <input type="number" id="payableInput" placeholder="Enter Payable Days" min="0" max="999" oninput="validateInput(this)" value="30">
+                </div>
+            </td>
+            <td>
+                <div id="receivableChart" class="chart"></div>
+                <div class="input-label1">
+                    <label for="receivableInput">Receivable Days:</label>
+                    <input type="number" id="receivableInput" placeholder="Enter Receivable Days" min="0" max="999" oninput="validateInput(this)" value="75">
+                
+            </td>
+            <td>
+                <div id="cccChart" class="chart"></div>
+                <div class="input-label">
+                    <label for="cccOutput">Total Days Days:</label>
+                    <input type="number" id="cccOutput" placeholder="Total Days Days" readonly>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+</div>
+</body>
+ 
+  <script>
+
+
+ShowContainers(false);
+function validateInputB(input) {
+      var value = input.value.replace(/[^0-9.]/g, '');
+value = value.slice(0, 10);  
+var formattedValue = "€" + parseFloat(value).toLocaleString(undefined, {
+          
+      });
+         input.value = formattedValue;
+    }
+
+
+    function updateAverageReceivable() {
+    
+    var yearlyRevenue = parseFloat(document.getElementById('yearlyRevenue').value.replace(/[^0-9.-]+/g, ''));
+    var rdays = document.getElementById('receivableInput').value;
+
+    // Perform calculations
+    var averageRevenue = yearlyRevenue * (rdays / 360);
+
+ // Format the calculated value as currency
+    var formattedValue = '€' + averageRevenue.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0       
+});
+
+
+    // Update the average revenue input field
+    document.getElementById('averageRevenue').value = formattedValue;
+
+    // Update the maximum value of the slider
+    document.getElementById('myRange').max = (averageRevenue * 0.8);
+
+    // Reset other fields
+    document.getElementById('myRange').value = 0;
+    document.getElementById('finance').value = 0;
+    displayButton(false);
+}
+
+    
+
+ 
+   function updateSliderValue(value) {
+    // Format the value as currency
+    var formattedValue = '$' + parseFloat(value).toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    });
+
+    // Update the "finance" input field with the formatted value
+    document.getElementById('finance').value = formattedValue;
+}
+
+ 
+function displayButton(shouldBeVisible) {
+    var button = document.getElementById('submitButton');
+    if (shouldBeVisible) {
+        button.style.display = 'inline-block';
+    } else {
+        button.style.display = 'none';
+    }
+var button = document.getElementById('resetButton');
+    if (shouldBeVisible) {
+        button.style.display = 'inline-block';
+    } else {
+        button.style.display = 'none';
+    }
+
+}
+
+
+function calculateFRdays() {
+    var RevenueString = document.getElementById('yearlyRevenue').value;
+    var ARevenueString = document.getElementById('averageRevenue').value;
+    var FinanceString = document.getElementById('myRange').value;
+
+    var RevenueN = parseFloat(RevenueString.replace(/€|,/g, ''));
+    var ARevenueN = parseFloat(ARevenueString.replace(/€|,/g, ''));
+    var FinanceN = parseFloat(FinanceString.replace(/€|,/g, ''));
+
+    var FRdays = (((ARevenueN - FinanceN) / RevenueN) * 360);
+     FRdays = Math.round(FRdays);
+    return FRdays;
+}
+
+
+function calculateFCCCdays() {
+      var stock = parseInt(document.getElementById('stockInput').value) || 0;
+      var payable = parseInt(document.getElementById('payableInput').value) || 0;
+      var receivable = parseInt(document.getElementById('receivableInput').value) || 0;
+      var FCCCdays = stock - payable + receivable;
+      return FCCCdays; 
+}
+
+
+
+function MakeRead (read) {
+if (read) {
+        document.getElementById('yearlyRevenue').readOnly = true;
+        document.getElementById('stockInput').readOnly = true;
+        document.getElementById('payableInput').readOnly = true;
+        document.getElementById('receivableInput').readOnly = true;
+        document.getElementById('myRange').disabled = true;
+    } else {
+        document.getElementById('yearlyRevenue').readOnly = false;
+        document.getElementById('stockInput').readOnly = false;
+        document.getElementById('payableInput').readOnly = false;
+        document.getElementById('receivableInput').readOnly = false;
+        document.getElementById('myRange').disabled = false;
+    }
+
+
+}
+
+function ShowContainers(shouldBeVisible) {
+  var containerR = document.getElementById('containerReceivablesGraphics');
+  var containerC = document.getElementById('containerCCCGraphics');
+  if (shouldBeVisible) {
+    containerR.style.display = 'block';
+    containerC.style.display = 'block';
+ // Show the container
+  } else {
+    containerR.style.display = 'none'; // Hide the container
+    containerC.style.display = 'none';
+  }
+}
+
+
+function FinanceButtonClick() {
+   MakeRead (true);
+   var ReceivableString = document.getElementById('receivableInput').value;
+   var ReceivableN = parseFloat(ReceivableString.replace(/€|,/g, ''));
+   var Fdays = calculateFRdays();
+   
+   document.getElementById('receivableInput').value = Fdays;
+   
+   drawChart('receivableChart', 'Receivable Days', (ReceivableN-Fdays), Fdays,2);
+   var FCCCdays = calculateFCCCdays();
+
+   document.getElementById('cccOutput').value = FCCCdays;  
+   
+   drawChart('cccChart', 'Cash Conversion Cycle', (ReceivableN-Fdays), Fdays,3);
+ShowContainers(true);
+
+
+
+
+
+var ARevenueString = document.getElementById('averageRevenue').value;
+var ARevenueN = parseFloat(ARevenueString.replace(/€|,/g, ''));
+var FinanceString = document.getElementById('myRange').value;
+
+var NReceivables = (ARevenueN - FinanceString);
+var DecreasedDays = ((1-(Fdays/ReceivableN))*100);
+
+var formattedNReceivables = NReceivables.toLocaleString('en-GB', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+
+var dynamicText = "Average Receivable amount on the balance sheet decreased from " + ARevenueString + " to " + formattedNReceivables + ". Your collection period has decreased by  " + DecreasedDays +  "% from " + ReceivableN + " days" + " to " + Fdays + " days.";
+
+
+ document.getElementById("dynamicText").textContent = dynamicText;
+
+
+}
+   
+ 
+
+function ResetButtonClick() {
+    drawCharts();
+    displayButton(false);
+    updateCCCChart(0);
+    MakeRead (false);
+ShowContainers(false);
+}
+ 
+
+  </script> 
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawCharts);
+
+var YearRevenue, AvRevenue, Finance;
+
+function drawCharts() {
+    drawChart('stockChart', 'Stock Days', 20, 0, 0); // Pass 0 as financeValue
+    drawChart('payableChart', 'Payable Days', 30, 0, 0); // Pass 0 as financeValue
+    drawChart('receivableChart', 'Receivable Days', 75, 0, 0); // Pass 0 as financeValue
+    drawChart('cccChart', 'Cash Conversion Cycle Days', 65, 0, 1); // Pass 0 as financeValue
+
+    document.getElementById('stockInput').value = 20;
+    document.getElementById('payableInput').value = 30;
+    document.getElementById('receivableInput').value = 75;
+    document.getElementById('cccOutput').value = 65;
+} 
+
+function drawChart(chartId, title, value, financeValue, colors) {
+    var test = financeValue + 0;
+    var data = google.visualization.arrayToDataTable([
+        ['Task', 'Days'],
+        ['Finance days', test],
+        ['Days', value],
+        ['Dummy', 10],
+        ['Fixed', (10 + value + test)]
+    ]);
+
+    var colorArrays = [
+        ['#16345F', '#16345F', '#ffffff', '#f0f0f0'],  // Color array 0
+        ['#F8A700', '#F8A700', '#ffffff', '#f0f0f0'],  // Color array 1 for cc
+        ['#16345F', '#BFD3F0', '#ffffff', '#f0f0f0'],  // Color array 2 finance rr
+        ['#F8A700', '#FFC000', '#ffffff', '#f0f0f0'],  // Color array 3 for finance cc
+    ];
+  
+    var options = {
+        title: title,
+        pieHole: 0.6,
+        legend: 'none',
+        pieSliceText: 'none',
+        titleTextStyle: {
+            fontSize: 14,
+            bold: true,
+            textAlign: 'center'
+        },
+        pieStartAngle: -90,
+        backgroundColor: 'transparent',
+        slices: {
+            0: { color: colorArrays[colors][0] },
+            1: { color: colorArrays[colors][1] },
+            2: { color: colorArrays[colors][2] },
+            3: { color: colorArrays[colors][3] }
+        },
+        tooltip: { trigger: 'none' },
+        pieSliceBorderColor: 'transparent'
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById(chartId));
+    chart.draw(data, options);
+}
+
+
+     function validateInput(input) {
+      if (input.value.length > 3) {
+        input.value = input.value.slice(0, 3); // Limit input to 3 characters
+      }
+      updateChart(input.id, input.id.replace('Input', 'Chart'));
+    } 
+
+    function updateChart(inputId, chartId) {
+      var inputValue = parseInt(document.getElementById(inputId).value) || 0;
+      drawChart(chartId, inputId.replace('Input', ' Days'), inputValue, 0, 0);
+      updateCCCChart(0);
+      updateAverageReceivable();
+    }   
+
+ 
+function updateCCCChart(value) {
+      var fvalue = (value + 0);
+      var stock = parseInt(document.getElementById('stockInput').value) || 0;
+          var payable = parseInt(document.getElementById('payableInput').value) || 0;
+      var receivable = parseInt(document.getElementById('receivableInput').value) || 0;
+      
+      var ccc = stock + receivable - payable;
+      document.getElementById('cccOutput').value = ccc;
+
+      drawChart('cccChart', 'Cash Conversion Cycle Days', ccc, fvalue , 1);
+       
+    }
+
+ 
+
+updateAverageReceivable();
+  </script> 
+</html>
